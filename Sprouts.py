@@ -1,4 +1,4 @@
-from random import randint
+from random import randint # импорт необходимых модулей
 
 import pygame
 
@@ -20,9 +20,9 @@ def crossline(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2):  # функция на п
     return v1 * v2 < 0 and v3 * v4 < 0
 
 
-font = pygame.font.Font("C:/Users/acer/AppData/Local/Microsoft/Windows/Fonts/GorgeousPixel.ttf", 36)
-lose = 0
-close = pygame.image.load('ok.png').convert_alpha()
+font = pygame.font.Font("C:/Users/acer/AppData/Local/Microsoft/Windows/Fonts/GorgeousPixel.ttf", 36) # задаем шрифт для текста
+lose = 0 # инициализируем переменную для отслеживания поражения
+close = pygame.image.load('ok.png').convert_alpha() # загружаем изображения
 
 ar_left, ar_right = pygame.image.load('arrow_left.png').convert_alpha(), pygame.image.load(
     'arrow_right.png').convert_alpha()
@@ -42,19 +42,19 @@ winstr = pygame.image.load('win.png').convert_alpha()
 options = pygame.image.load('optionsfon.jpg').convert_alpha()
 winf = pygame.image.load('winf.jpg').convert_alpha()
 again = pygame.image.load('снова.png').convert_alpha()
-fon_list = [image1, image5]
-fon_list_name = [font.render('Earth', True, (0, 0, 0)), font.render('Field', True, (0, 0, 0))]
-chosenfon = 0
-widthline = 1
+fon_list = [image1, image5] # создаем спсиок изображений фонов
+fon_list_name = [font.render('Earth', True, (0, 0, 0)), font.render('Field', True, (0, 0, 0))] #  cоздаем список названий фонов
+chosenfon = 0 # Изначально выбранный фон
+widthline = 1 # Задаем ширину линии
 
-dots, line, chosedot = [], [], [0, 0]
+dots, line, chosedot = [], [], [0, 0] # создаем пустые списки для точек и линий, а также переменные для выбранной точки и игрока
 pl, dotcheck = 1, 0
-dotscolor, linecolor = (0, 133, 0), (57, 230, 57)
+dotscolor, linecolor = (0, 133, 0), (57, 230, 57) # задаем цвета точек и линий
 linex, liney, newdot, x, y = 0, 0, (0, 0), 0, 0
-game, dot_line_dot, dot_append, win, dot = True, False, False, False, False
+game, dot_line_dot, dot_append, win, dot = True, False, False, False, False # изначально линия не нарисована, новая точка не добавлена, победы и точка-точка-линия не достигнуты
 changefon, changewidth = font.render('Change background', True, (0, 0, 0)), font.render('Change line width', True,
-                                                                                        (0, 0, 0))
-FPS = 60
+                                                                                        (0, 0, 0)) # задаем текст для кнопок изменения фона и толщины линии
+FPS = 60 # задаем FPS и начальные значения для экранов начала и настроек
 begin, setting = True, False
 
 while game:  # цикл игры
@@ -64,8 +64,8 @@ while game:  # цикл игры
             game = False
         if ev.type == pygame.MOUSEMOTION:  # движения мыши
             x = ev.pos[0]
-            y = ev.pos[1]
-            if dot_append:
+            y = ev.pos[1] # получаем координаты мыши
+            if dot_append: # если есть пересечение, устанавливаем новую точку на пересечении
                 for i in line:
                     if 400 > ((x - i[0]) * (i[3] - i[1]) - (y - i[1]) * (i[2] - i[0])) > -400:
                         if (i[0] + 10 > x > i[2] - 10 and 10 + i[1] > y > i[3] - 10) or (
@@ -87,7 +87,7 @@ while game:  # цикл игры
 
                     if begin and 0 <= x <= 90 and 0 <= y <= 65:  # настройки
                         setting = True
-                    if setting:
+                    if setting:# переход в настройки
                         if 50 <= x <= 200 <= y <= 280:  # фон
                             if chosenfon != 0:
                                 chosenfon -= 1
@@ -103,7 +103,7 @@ while game:  # цикл игры
                         if WIDTH // 2 - 50 <= x <= WIDTH // 2 + 50 and 600 <= y <= 700:  # выход настроек
                             setting = False
 
-                    for i in line:  # проверка на прекращение линии
+                    for i in line:  # если координаты точки пересекаются с линией, используя функцию crossline, и линия пересекается с точкой, устанавливаем новую точку на пересечении
                         if crossline(x, y, linex + 1, liney + 1, i[0], i[1], i[2], i[3]) and crossline(x, y,
                                                                                                          linex - 1,
                                                                                                          liney - 1,
@@ -135,7 +135,7 @@ while game:  # цикл игры
                             if x <= chosedot[0] <= x + 20 and y <= chosedot[1] <= y + 20:
                                 pass
                             else:
-                                if i[0] <= x <= i[0] + 20 and i[1] <= y <= i[1] + 20:  # линия проводится к точке
+                                if i[0] <= x <= i[0] + 20 and i[1] <= y <= i[1] + 20:  # если точка выбрана, проводим линию к ней
                                     if i[2] < 3:
                                         if not dot:
                                             i[2] += 1
@@ -143,7 +143,7 @@ while game:  # цикл игры
                                             dot_append = True
                                             dot_line_dot = False
                                 else:
-                                    if not dot:  # линия проводиться
+                                    if not dot:  # если точка не выбрана, просто проводим линию
                                         chosedot = [0, 0]
                                         line.append([x, y, linex, liney, widthline])
                                         linex = x
@@ -213,8 +213,8 @@ while game:  # цикл игры
         screen.blit(winf, (0, 0))
         screen.blit(winstr, (WIDTH // 2 - 60, HEIGHT // 2 - 90))
         screen.blit(again, (WIDTH // 2 - 60, HEIGHT // 2 + 150))
-        if pl != 1:
+        if pl != 1: # если ходит 1 игрок, то отображетя его иконка
             screen.blit(player1, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
-        else:
+        else: # если 2 игрок, то его
             screen.blit(player2, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
     pygame.display.update()
