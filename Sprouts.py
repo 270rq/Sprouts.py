@@ -1,5 +1,6 @@
 from random import randint # импорт необходимых модулей
-
+import tkinter as tk
+from tkinter import messagebox
 import pygame
 
 pygame.init()
@@ -20,19 +21,16 @@ def crossline(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2):  # функция на п
     return v1 * v2 < 0 and v3 * v4 < 0
 
 
-font = pygame.font.Font("C:/Users/acer/AppData/Local/Microsoft/Windows/Fonts/GorgeousPixel.ttf", 36) # задаем шрифт для текста
+font = pygame.font.Font("GorgeousPixel.ttf", 36) # задаем шрифт для текста
 lose = 0 # инициализируем переменную для отслеживания поражения
 close = pygame.image.load('ok.png').convert_alpha() # загружаем изображения
 
 ar_left, ar_right = pygame.image.load('arrow_left.png').convert_alpha(), pygame.image.load(
     'arrow_right.png').convert_alpha()
-music = pygame.mixer.Sound("fonm.wav")
-music.play(1)
 optionss = pygame.image.load('opionss.png').convert_alpha()
 fail = pygame.image.load('error.png').convert_alpha()
 image = pygame.image.load('glavnfon.png').convert_alpha()
 image1 = pygame.image.load('fon.png').convert_alpha()
-image2 = pygame.image.load('seed.png').convert_alpha()
 sdadit = pygame.image.load('surrer.png').convert_alpha()
 image4 = pygame.image.load('start.png').convert_alpha()
 image5 = pygame.image.load('winfon.png').convert_alpha()
@@ -46,7 +44,17 @@ fon_list = [image1, image5] # создаем спсиок изображений
 fon_list_name = [font.render('Earth', True, (0, 0, 0)), font.render('Field', True, (0, 0, 0))] #  cоздаем список названий фонов
 chosenfon = 0 # Изначально выбранный фон
 widthline = 1 # Задаем ширину линии
+def show_modal_window():
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True) # установка флага "always on top"
+    messagebox.showinfo("Правила", "Игроки по очереди ходят. Каждый ход игрока состоит в том, что он либо соединяет две точки линией (прямой или кривой), либо рисует линию-петлю, начинающуюся в какой-нибудь точке и в этой же точке заканчивающуюся.\nНа каждой проведённой линии рисуется одна новая точка; новые точки равноправны первоначальным (от них также можно проводить линии, на каждой из которых также рисуется по одной точке).\nПри этом должны соблюдаться следующие правила:\nЛинии не должны пересекаться (самопересечения линий тоже недопустимы).\nПроводимая линия не должна проходить через ранее поставленные точки, не являющиеся началом или концом этой линии, — она может от одной точки начинаться и в другой или в той же точке заканчиваться, а больше никаких касаний линией точек быть не должно.\nИз каждой точки не должно исходить более трёх линий. Поэтому к новой точке нельзя пририсовать петлю, поскольку иначе получится 4 исходящие линии (петля считается двумя исходящими от точки линиями, плюс новая точка уже лежит на линии, то есть от неё уже исходит две линии).\nПроигрывает тот игрок, который не сможет сделать ход, когда в очередной раз наступит его очередь ходить. Можно также играть в поддавки — в этом случае тот, кто сходит последним, считается не выигравшим, а, наоборот, проигравшим.")
 
+    root.destroy()
+
+    # Блокировка основного окна Pygame
+    pygame.display.set_mode((800, 600), pygame.NOFRAME)
+    pygame.display.set_caption("")
 dots, line, chosedot = [], [], [0, 0] # создаем пустые списки для точек и линий, а также переменные для выбранной точки и игрока
 pl, dotcheck = 1, 0
 dotscolor, linecolor = (0, 133, 0), (57, 230, 57) # задаем цвета точек и линий
@@ -84,7 +92,11 @@ while game:  # цикл игры
                 else:
                     if not begin and 0 <= x <= 95 and 0 <= y <= 65:  # сдаться
                         win = True
+                    if not begin and 705 <= x <= 800 and 0 <= y <= 65:  # сдаться
+                        show_modal_window()
 
+                        pygame.display.set_mode((800, 800))
+                        pygame.display.set_caption("Pygame")
                     if begin and 0 <= x <= 90 and 0 <= y <= 65:  # настройки
                         setting = True
                     if setting:# переход в настройки
@@ -98,7 +110,7 @@ while game:  # цикл игры
                             if widthline != 1:
                                 widthline -= 1
                         if WIDTH - 200 <= x <= WIDTH - 50 and 500 <= y <= 580:
-                            if widthline != 3:
+                            if widthline != 3: 
                                 widthline += 1
                         if WIDTH // 2 - 50 <= x <= WIDTH // 2 + 50 and 600 <= y <= 700:  # выход настроек
                             setting = False
@@ -137,13 +149,14 @@ while game:  # цикл игры
                             else:
                                 if i[0] <= x <= i[0] + 20 and i[1] <= y <= i[1] + 20:  # если точка выбрана, проводим линию к ней
                                     if i[2] < 3:
-                                        if not dot:
+                                        if not dot_append:
                                             i[2] += 1
                                             line.append([x, y, linex, liney, widthline])
                                             dot_append = True
                                             dot_line_dot = False
                                 else:
-                                    if not dot:  # если точка не выбрана, просто проводим линию
+                                    if not dot_append:  # если точка не выбрана, просто проводим линию
+
                                         chosedot = [0, 0]
                                         line.append([x, y, linex, liney, widthline])
                                         linex = x
@@ -151,17 +164,17 @@ while game:  # цикл игры
 
                     else:
                         for i in dots:  # выбирается точка
-                            if i[0] <= x <= i[0] + 20 and i[1] <= y <= i[1] + 20 and i[2] < 3 and not dot_line_dot:
-                                linex = x
-                                liney = y
-                                chosedot = [x, y]
-                                i[2] += 1
-                                dot_line_dot = True
+                            if i[0] <= x <= i[0] + 20 and i[1] <= y <= i[1] + 20 and i[2] < 3 and not dot_append and not dot:
+                                    linex = x
+                                    liney = y
+                                    chosedot = [x, y]
+                                    i[2] += 1
+                                    dot_line_dot = True
                         if dot_append and newdot[0] > 0 and newdot[1] > 0:  # смена игрока
                             dots.append([newdot[0], newdot[1], 2])
                             dot_append = False
                             if pl == 1:
-                                pl = 2
+                                pl = 2  
                             else:
                                 pl = 1
 
@@ -193,6 +206,8 @@ while game:  # цикл игры
         screen.blit(fon_list[chosenfon], (0, 0))
         pygame.draw.rect(screen, (125, 125, 125), (0, 0, 95, 65), 0)
         screen.blit(sdadit, (5, 25))
+        pygame.draw.rect(screen, (125, 125, 125), (705, 0, 95, 65), 0)
+        screen.blit(font.render("RULES",True,(255,255,255)), (710, 10))
         if dot:
             screen.blit(fail, (WIDTH // 2, HEIGHT // 2))
         if pl == 1:  # очередь хождения
@@ -200,7 +215,7 @@ while game:  # цикл игры
         else:
             screen.blit(player2, (WIDTH // 2 - 60, 10))
         if newdot[1] > 0 and newdot[0] > 0:  # отрисовка точки на линии
-            screen.blit(image2, newdot, )
+            pygame.draw.circle(screen, (0, 133, 0),newdot,10)
         if dot_line_dot:  # отрисовка линии которую ставят
             pygame.draw.line(screen, linecolor, [linex, liney], [x, y], widthline)
         for i in line:  # отрисовка линий
@@ -208,7 +223,8 @@ while game:  # цикл игры
                 line.remove(i)
             pygame.draw.line(screen, linecolor, [i[0], i[1]], [i[2], i[3]], i[4])
         for i in dots:  # отрисовка точек
-            screen.blit(image2, (i[0], i[1]), )
+            pygame.draw.circle(screen, (0, 133, 0),(i[0],i[1]),10)
+
     else:  # отрисовка результата
         screen.blit(winf, (0, 0))
         screen.blit(winstr, (WIDTH // 2 - 60, HEIGHT // 2 - 90))
